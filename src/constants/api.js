@@ -13,8 +13,6 @@ export const ENDPOINTS = {
   AUTH: {
     REGISTER: '/register',
     LOGIN: '/login',
-    REFRESH_TOKEN: '/refresh-token',
-    LOGOUT: '/logout',
   },
   PLAYLIST: {
     SONGS: '/:playlistId/songs',

@@ -50,35 +50,3 @@ export const login = async (req, res, next) => {
     return apiResponse(res, false, 'Server error: ' + err.message, null, STATUS_CODES.INTERNAL_SERVER_ERROR);
   }
 };
-
-export const refresh = async (req, res, next) => {
-  const { refreshToken } = req.body;
-  if (!refreshToken) return apiResponse(res, false, 'Token required', null, STATUS_CODES.BAD_REQUEST);
-
-  try {
-    const payload = verifyRefreshToken(refreshToken);
-    const user = await User.findById(payload.userId);
-    if (!user || !user.refreshTokens.includes(refreshToken)) {
-      return apiResponse(res, false, 'Invalid refresh token', null, STATUS_CODES.FORBIDDEN);
-    }
-
-    const newAccessToken = generateAccessToken(user._id);
-    return apiResponse(res, true, 'Token refreshed successfully', { accessToken: newAccessToken });
-  } catch (err) {
-    return apiResponse(res, false, 'Invalid refresh token', null, STATUS_CODES.FORBIDDEN);
-  }
-};
-
-export const logout = async (req, res, next) => {
-  const { refreshToken } = req.body;
-  try {
-    const payload = verifyRefreshToken(refreshToken);
-    await User.updateOne(
-      { _id: payload.userId },
-      { $pull: { refreshTokens: refreshToken } }
-    );
-    return apiResponse(res, true, 'Logged out successfully');
-  } catch (err) {
-    return apiResponse(res, false, 'Invalid refresh token', null, STATUS_CODES.FORBIDDEN);
-  }
-};
